@@ -1,0 +1,4 @@
+Agregar puntos o comas a los precios para que quede mejor
+al seleccionar un producto que abra una especie de ventana emergente para ver mas detallado y grande el producto
+agregar redes sociales a los banner de todas las paginas
+lo que se vaya agregando al inicio a los productos, se agreguen a la galeria(borrar lo qye esta en galeria)

@@ -1,0 +1,125 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Preguntas frecuentes | Inacap Shop</title>
+        <meta
+            name="description"
+            content="Inacap Shop: catálogo de tecnología, audio y accesorios."
+        />
+        <link rel="stylesheet" href="{% static 'core/css/styles.css' %}" />
+        <link rel="stylesheet" href="{% static 'core/css/shop.css' %}" />
+        <script src="{% static 'core/js/products.js' %}" defer></script>
+        <script src="{% static 'core/js/cart.js' %}" defer></script>
+        <script src="{% static 'core/js/scripts.js' %}" defer></script>
+    </head>
+    <body>
+        <a class="skip" href="#contenido">Saltar al contenido</a>
+        <nav class="shop-nav" aria-label="Navegación principal">
+            <div class="container nav-inner">
+                <a class="brand" href="{% url 'index' %}">Inacap <strong>Shop</strong></a>
+                <ul>
+                    <li><a href="{% url 'index' %}">Inicio</a></li>
+                    <li><a href="{% url 'about' %}">Quiénes somos</a></li>
+                    <li><a href="{% url 'gallery' %}">Galería</a></li>
+                    <li><a href="{% url 'faq' %}" aria-current="page">Preguntas frecuentes</a></li>
+                </ul>
+                <button class="btn btn-outline-dark" type="button" data-open-cart>
+                    Carrito <span class="cart-count" data-count>0</span>
+                </button>
+            </div>
+        </nav>
+        <header class="bg-dark py-5">
+            <div class="container text-center text-white py-3">
+                <p class="eyebrow">TECNOLOGÍA PARA TU DÍA A DÍA</p>
+                <h1 class="display-4 fw-bolder">Preguntas frecuentes</h1>
+                <p class="lead text-white-50 mb-0">
+                    Resuelve tus dudas sobre el catálogo y el carrito.
+                </p>
+            </div>
+        </header>
+        <main id="contenido" class="container py-5">
+            <section class="reading">
+                <h2 class="mb-4">Antes de empezar</h2>
+                <details class="faq">
+                    <summary>¿Qué productos puedo encontrar?</summary>
+                    <p>
+                        Componentes para computadores, parlantes, audífonos y accesorios de carga.
+                        Puedes revisar los ocho productos en Inicio.
+                    </p>
+                </details>
+                <details class="faq">
+                    <summary>¿Cómo añado productos al carrito?</summary>
+                    <p>
+                        En Inicio, presiona «Añadir al carrito» debajo de un producto. Luego abre
+                        «Carrito» en el menú para ver el resumen.
+                    </p>
+                </details>
+                <details class="faq">
+                    <summary>¿Puedo cambiar las cantidades o quitar un producto?</summary>
+                    <p>
+                        Sí. Usa los botones + y − del carrito para ajustar las cantidades, o
+                        «Quitar» para eliminar un producto. También puedes vaciar el carrito
+                        completo.
+                    </p>
+                </details>
+                <details class="faq">
+                    <summary>¿En qué moneda están los precios?</summary>
+                    <p>
+                        Todos los valores se muestran en pesos chilenos (CLP). Son precios de
+                        demostración para este proyecto académico.
+                    </p>
+                </details>
+                <details class="faq">
+                    <summary>¿Puedo pagar o solicitar un envío?</summary>
+                    <p>
+                        No. Esta versión es una demostración y no procesa compras, pagos ni
+                        despachos.
+                    </p>
+                </details>
+                <details class="faq">
+                    <summary>¿Se conserva mi carrito al cambiar de página?</summary>
+                    <p>
+                        Sí, cuando el almacenamiento del navegador está disponible. Para conservarlo
+                        entre páginas de forma consistente, abre el sitio con Go Live o un servidor
+                        local. Si borras los datos del navegador, el carrito se reinicia.
+                    </p>
+                </details>
+            </section>
+        </main>
+        <footer class="bg-dark text-white py-4">
+            <div class="container footer-inner">
+                <strong>Inacap Shop</strong>
+                <p class="mb-0">Proyecto académico · Catálogo y precios de demostración · 2026</p>
+            </div>
+        </footer>
+        <dialog id="cart-dialog" aria-labelledby="cart-title">
+            <div class="cart-heading">
+                <h2 id="cart-title">Tu carrito</h2>
+                <button
+                    type="button"
+                    class="btn btn-outline-dark"
+                    data-close-cart
+                    aria-label="Cerrar carrito"
+                >
+                    Cerrar
+                </button>
+            </div>
+            <div id="cart-items"></div>
+            <div class="cart-summary">
+                <p>Total <strong id="cart-total">$0</strong></p>
+                <p class="text-muted">
+                    Valores en pesos chilenos. Esta demostración no procesa pedidos ni pagos.
+                </p>
+                <button class="btn btn-outline-danger" id="clear-cart" type="button">
+                    Vaciar carrito</button
+                ><button class="btn btn-dark" data-close-cart type="button">
+                    Seguir viendo productos
+                </button>
+            </div>
+        </dialog>
+        <p id="notice" role="status" aria-live="polite"></p>
+    </body>
+</html>

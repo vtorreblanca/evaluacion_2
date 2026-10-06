@@ -1,0 +1,9 @@
+Imagen de placa madre: incluida en EV2.zip por el equipo.
+Imágenes de demostración: DummyJSON (https://dummyjson.com), consultado el 22-09-2026.
+Amazon Echo Plus — https://cdn.dummyjson.com/product-images/mobile-accessories/amazon-echo-plus/thumbnail.webp
+Apple Airpods — https://cdn.dummyjson.com/product-images/mobile-accessories/apple-airpods/thumbnail.webp
+Apple AirPods Max Silver — https://cdn.dummyjson.com/product-images/mobile-accessories/apple-airpods-max-silver/thumbnail.webp
+Apple Airpower Wireless Charger — https://cdn.dummyjson.com/product-images/mobile-accessories/apple-airpower-wireless-charger/thumbnail.webp
+Apple HomePod Mini Cosmic Grey — https://cdn.dummyjson.com/product-images/mobile-accessories/apple-homepod-mini-cosmic-grey/thumbnail.webp
+Apple iPhone Charger — https://cdn.dummyjson.com/product-images/mobile-accessories/apple-iphone-charger/thumbnail.webp
+Apple MagSafe Battery Pack — https://cdn.dummyjson.com/product-images/mobile-accessories/apple-magsafe-battery-pack/thumbnail.webp
