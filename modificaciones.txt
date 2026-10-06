@@ -1,7 +1,1 @@
-Agregar puntos o comas a los precios para que quede mejor
-al seleccionar un producto que abra una especie de ventana emergente para ver mas detallado y grande el producto
-lo que se vaya agregando al inicio a los productos, se agreguen a la galeria(borrar lo qye esta en galeria)
-agregar valoraciones hechas por usuarios
-hacer que la descripcion del producto sea al seleccionar y se abra un "pop up?????????"
-jajjajjaja
 hacer paginacion

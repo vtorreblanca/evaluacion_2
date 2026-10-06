@@ -2,14 +2,45 @@ import json
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+from django.core.paginator import Paginator
 from .models import Producto, Valoracion
 
 def index(request):
-    productos = Producto.objects.filter(activo=True).prefetch_related('valoraciones')
-    total_productos = productos.count()
+    # Obtenemos los productos activos
+    productos_list = Producto.objects.filter(activo=True).prefetch_related('valoraciones')
+    
+    # Parámetros GET
+    categoria = request.GET.get('categoria', '').strip()
+    orden = request.GET.get('orden', '').strip()
+    
+    # 1. Filtro por Categoría
+    if categoria in ['Componentes', 'Audio', 'Accesorios']:
+        productos_list = productos_list.filter(categoria=categoria)
+        
+    # 2. Ordenamiento (Alfabético y Precios)
+    if orden == 'az':
+        productos_list = productos_list.order_by('nombre')
+    elif orden == 'za':
+        productos_list = productos_list.order_by('-nombre')
+    elif orden == 'precio_asc':
+        productos_list = productos_list.order_by('precio')
+    elif orden == 'precio_desc':
+        productos_list = productos_list.order_by('-precio')
+    else:
+        productos_list = productos_list.order_by('-creado')
+
+    total_productos = productos_list.count()
+    
+    # Paginación (4 productos por página)
+    paginator = Paginator(productos_list, 4)
+    page_number = request.GET.get('page')
+    productos = paginator.get_page(page_number)
+    
     return render(request, 'core/index.html', {
         'productos': productos,
         'total_productos': total_productos,
+        'categoria_actual': categoria,
+        'orden_actual': orden,
     })
 
 @require_POST

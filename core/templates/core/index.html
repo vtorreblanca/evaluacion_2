@@ -13,10 +13,50 @@
         </div>
     </header>
     <main id="contenido" class="container py-5">
+        
+        <!-- Barra de filtros y ordenamiento -->
+        <div class="p-3 mb-4 rounded bg-light border">
+            <form method="GET" action="{% url 'index' %}" class="row g-3 align-items-center justify-content-between">
+                
+                <!-- Filtro por Categoría -->
+                <div class="col-12 col-md-5 d-flex align-items-center gap-2">
+                    <label for="filter-categoria" class="form-label mb-0 fw-semibold text-nowrap small text-muted">Categoría:</label>
+                    <select id="filter-categoria" name="categoria" class="form-select form-select-sm" onchange="this.form.submit()">
+                        <option value="">Todas las categorías</option>
+                        <option value="Audio" {% if categoria_actual == 'Audio' %}selected{% endif %}>Audio</option>
+                        <option value="Accesorios" {% if categoria_actual == 'Accesorios' %}selected{% endif %}>Accesorios</option>
+                        <option value="Componentes" {% if categoria_actual == 'Componentes' %}selected{% endif %}>Componentes</option>
+                    </select>
+                </div>
+
+                <!-- Ordenamiento (Alfabeto y Precio) -->
+                <div class="col-12 col-md-5 d-flex align-items-center gap-2">
+                    <label for="filter-orden" class="form-label mb-0 fw-semibold text-nowrap small text-muted">Ordenar por:</label>
+                    <select id="filter-orden" name="orden" class="form-select form-select-sm" onchange="this.form.submit()">
+                        <option value="">Más recientes (Por defecto)</option>
+                        <option value="az" {% if orden_actual == 'az' %}selected{% endif %}>Nombre: A - Z</option>
+                        <option value="za" {% if orden_actual == 'za' %}selected{% endif %}>Nombre: Z - A</option>
+                        <option value="precio_asc" {% if orden_actual == 'precio_asc' %}selected{% endif %}>Precio: Menor a Mayor</option>
+                        <option value="precio_desc" {% if orden_actual == 'precio_desc' %}selected{% endif %}>Precio: Mayor a Menor</option>
+                    </select>
+                </div>
+
+                <!-- Limpiar filtros -->
+                {% if categoria_actual or orden_actual %}
+                <div class="col-12 col-md-2 text-md-end">
+                    <a href="{% url 'index' %}" class="btn btn-outline-secondary btn-sm w-100 text-nowrap">
+                        Limpiar filtros
+                    </a>
+                </div>
+                {% endif %}
+            </form>
+        </div>
+
         <div class="section-heading">
             <h2>Nuestros productos</h2>
-            <p class="text-muted">{{ total_productos }} productos · Precios en pesos chilenos</p>
+            <p class="text-muted">{{ total_productos }} productos encontrados · Precios en pesos chilenos</p>
         </div>
+
         <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
             {% for producto in productos %}
             <div class="col">
@@ -104,10 +144,53 @@
             </div>
             {% empty %}
             <div class="col-12 text-center py-5">
-                <p class="text-muted fs-5">No hay productos disponibles por el momento.</p>
-                <p class="text-muted">Agrega productos desde el panel de administración de Django.</p>
+                <p class="text-muted fs-5">No se encontraron productos con los filtros seleccionados.</p>
+                <a href="{% url 'index' %}" class="btn btn-dark btn-sm mt-2">Restablecer filtros</a>
             </div>
             {% endfor %}
         </div>
+
+        <!-- Paginación con persistencia de filtros -->
+        {% if productos.has_other_pages %}
+        <nav aria-label="Navegación de páginas" class="mt-5">
+            <ul class="pagination justify-content-center">
+                {% if productos.has_previous %}
+                <li class="page-item">
+                    <a class="page-link text-dark" href="?page={{ productos.previous_page_number }}&categoria={{ categoria_actual }}&orden={{ orden_actual }}" aria-label="Anterior">
+                        &laquo; Anterior
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link text-muted">&laquo; Anterior</span>
+                </li>
+                {% endif %}
+
+                {% for i in productos.paginator.page_range %}
+                    {% if productos.number == i %}
+                    <li class="page-item active" aria-current="page">
+                        <span class="page-link bg-dark border-dark text-white">{{ i }}</span>
+                    </li>
+                    {% else %}
+                    <li class="page-item">
+                        <a class="page-link text-dark" href="?page={{ i }}&categoria={{ categoria_actual }}&orden={{ orden_actual }}">{{ i }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if productos.has_next %}
+                <li class="page-item">
+                    <a class="page-link text-dark" href="?page={{ productos.next_page_number }}&categoria={{ categoria_actual }}&orden={{ orden_actual }}" aria-label="Siguiente">
+                        Siguiente &raquo;
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link text-muted">Siguiente &raquo;</span>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
     </main>
 {% endblock %}
