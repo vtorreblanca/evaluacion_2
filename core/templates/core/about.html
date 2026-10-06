@@ -1,114 +1,33 @@
-{% load static %}
-<!doctype html>
-<html lang="es">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Quiénes somos | Inacap Shop</title>
-        <meta
-            name="description"
-            content="Inacap Shop: catálogo de tecnología, audio y accesorios."
-        />
-        <link rel="stylesheet" href="{% static 'core/css/styles.css' %}" />
-        <link rel="stylesheet" href="{% static 'core/css/shop.css' %}" />
-        <script src="{% static 'core/js/products.js' %}" defer></script>
-        <script src="{% static 'core/js/cart.js' %}" defer></script>
-        <script src="{% static 'core/js/scripts.js' %}" defer></script>
-    </head>
-    <body>
-        <a class="skip" href="#contenido">Saltar al contenido</a>
-        <nav class="shop-nav" aria-label="Navegación principal">
-            <div class="container nav-inner">
-                <a class="brand" href="{% url 'index' %}">Inacap <strong>Shop</strong></a>
-                <ul>
-                    <li><a href="{% url 'index' %}">Inicio</a></li>
-                    <li><a href="{% url 'about' %}" aria-current="page">Quiénes somos</a></li>
-                    <li><a href="{% url 'gallery' %}">Galería</a></li>
-                    <li><a href="{% url 'faq' %}">Preguntas frecuentes</a></li>
-                </ul>
-                <button class="btn btn-outline-dark" type="button" data-open-cart>
-                    Carrito <span class="cart-count" data-count>0</span>
-                </button>
-            </div>
-        </nav>
-        <header class="bg-dark py-5">
-            <div class="container text-center text-white py-3">
-                <p class="eyebrow">TECNOLOGÍA PARA TU DÍA A DÍA</p>
-                <h1 class="display-4 fw-bolder">Quiénes somos</h1>
-                <p class="lead text-white-50 mb-0">
-                    Nos interesa la tecnología que usamos todos los días.
-                </p>
-            </div>
-        </header>
-        <main id="contenido" class="container py-5">
-            <section class="reading">
-                <h2>Una tienda creada para aprender</h2>
-                <p class="lead">
-                    Somos estudiantes de informática y creamos Inacap Shop como un proyecto
-                    académico de tienda tecnológica.
-                </p>
-                <p>
-                    Reunimos componentes, equipos de audio y accesorios en un catálogo sencillo de
-                    recorrer. Buscamos que cada producto tenga una imagen, una descripción clara y
-                    un precio fácil de identificar.
-                </p>
-                <div class="row g-4 mt-3">
-                    <div class="col-md-6">
-                        <h3 class="h4">Nuestra misión</h3>
-                        <p>
-                            Presentar la tecnología de forma cercana y ofrecer una experiencia de
-                            navegación ordenada y fácil de usar.
-                        </p>
-                    </div>
-                    <div class="col-md-6">
-                        <h3 class="h4">Nuestra visión</h3>
-                        <p>
-                            Seguir aprendiendo a desarrollar sitios accesibles y útiles, mejorando
-                            tanto su contenido como su funcionamiento.
-                        </p>
-                    </div>
-                </div>
-                <hr class="my-4" />
-                <h3 class="h4">Sobre esta tienda</h3>
-                <p>
-                    Este es un catálogo de demostración: los precios son ilustrativos y no se
-                    realizan ventas, despachos ni cobros. Es un proyecto estudiantil, no una tienda
-                    oficial de INACAP.
-                </p>
-                <a class="btn btn-dark mt-2" href="{% url 'index' %}">Ver productos</a>
-            </section>
-        </main>
-        <footer class="bg-dark text-white py-4">
-            <div class="container footer-inner">
-                <strong>Inacap Shop</strong>
-                <p class="mb-0">Proyecto académico · Catálogo y precios de demostración · 2026</p>
-            </div>
-        </footer>
-        <dialog id="cart-dialog" aria-labelledby="cart-title">
-            <div class="cart-heading">
-                <h2 id="cart-title">Tu carrito</h2>
-                <button
-                    type="button"
-                    class="btn btn-outline-dark"
-                    data-close-cart
-                    aria-label="Cerrar carrito"
-                >
-                    Cerrar
-                </button>
-            </div>
-            <div id="cart-items"></div>
-            <div class="cart-summary">
-                <p>Total <strong id="cart-total">$0</strong></p>
-                <p class="text-muted">
-                    Valores en pesos chilenos. Esta demostración no procesa pedidos ni pagos.
-                </p>
-                <button class="btn btn-outline-danger" id="clear-cart" type="button">
-                    Vaciar carrito</button
-                ><button class="btn btn-dark" data-close-cart type="button">
-                    Seguir viendo productos
-                </button>
-            </div>
-        </dialog>
-        <p id="notice" role="status" aria-live="polite"></p>
-    </body>
-</html>
+{% extends 'core/base.html' %}
+
+{% block title %}Quiénes somos{% endblock %}
+
+{% block content %}
+    <header class="bg-dark py-5">
+        <div class="container text-center text-white py-3">
+            <p class="eyebrow">TECNOLOGÍA PARA TU DÍA A DÍA</p>
+            <h1 class="display-4 fw-bolder">Quiénes somos</h1>
+            <p class="lead text-white-50 mb-0">
+                Nos interesa la tecnología que usamos todos los días.
+            </p>
+        </div>
+    </header>
+    <main id="contenido" class="container py-5">
+        <section class="reading">
+            <h2>Una tienda creada para aprender</h2>
+            <p class="lead">
+                Somos estudiantes de informática y creamos Inacap Shop como un proyecto
+                académico de tienda tecnológica.
+            </p>
+            <p>
+                Reunimos componentes, equipos de audio y accesorios en un catálogo sencillo de
+                recorrer. Buscamos que cada producto tenga una imagen, una descripción clara y
+                un precio visible.
+            </p>
+            <p>
+                Este sitio es un prototipo desarrollado con Django y Bootstrap para demostrar
+                el funcionamiento de un catálogo interactivo con carrito de compras en el navegador.
+            </p>
+        </section>
+    </main>
+{% endblock %}
