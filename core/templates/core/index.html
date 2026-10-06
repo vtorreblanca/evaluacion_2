@@ -1,66 +1,301 @@
-{% extends 'core/base.html' %}
-
-{% block title %}Inacap Shop{% endblock %}
-
-{% block content %}
-    <header class="bg-dark py-5">
-        <div class="container text-center text-white py-3">
-            <p class="eyebrow">TECNOLOGÍA PARA TU DÍA A DÍA</p>
-            <h1 class="display-4 fw-bolder">Inacap Shop</h1>
-            <p class="lead text-white-50 mb-0">
-                Audio, accesorios y componentes en un solo lugar.
-            </p>
-        </div>
-    </header>
-    <main id="contenido" class="container py-5">
-        <div class="section-heading">
-            <h2>Nuestros productos</h2>
-            <p class="text-muted">{{ total_productos }} productos · Precios en pesos chilenos</p>
-        </div>
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
-            {% for producto in productos %}
-            <div class="col">
-                <article class="card h-100 product">
-                    {% if producto.imagen %}
-                    <img
-                        class="card-img-top"
-                        src="{{ producto.imagen.url }}"
-                        alt="{{ producto.nombre }}"
-                        width="450"
-                        height="300"
-                        style="object-fit: cover; height: 220px;"
-                    />
-                    {% endif %}
-                    <div class="card-body">
-                        <span class="category">{{ producto.categoria }}</span>
-                        <h3 class="h5 card-title">{{ producto.nombre }}</h3>
-                        <p class="text-muted">{{ producto.descripcion }}</p>
-                        <p class="price">${{ producto.precio }}</p>
-                    </div>
-                    <div class="card-footer bg-transparent border-0 pb-3">
-                        <button
-                            class="btn btn-dark w-100"
-                            type="button"
-                            data-add-to-cart
-                            data-id="{{ producto.id }}"
+{% load static %}
+<!doctype html>
+<html lang="es">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Inacap Shop | Inacap Shop</title>
+        <meta
+            name="description"
+            content="Inacap Shop: catálogo de tecnología, audio y accesorios."
+        />
+        <link rel="stylesheet" href="{% static 'core/css/styles.css' %}" />
+        <link rel="stylesheet" href="{% static 'core/css/shop.css' %}" />
+        <script src="{% static 'core/js/products.js' %}" defer></script>
+        <script src="{% static 'core/js/cart.js' %}" defer></script>
+        <script src="{% static 'core/js/scripts.js' %}" defer></script>
+    </head>
+    <body>
+        <a class="skip" href="#contenido">Saltar al contenido</a>
+        <nav class="shop-nav" aria-label="Navegación principal">
+            <div class="container nav-inner">
+                <a class="brand" href="{% url 'index' %}">Inacap <strong>Shop</strong></a>
+                <ul>
+                    <li><a href="{% url 'index' %}" aria-current="page">Inicio</a></li>
+                    <li><a href="{% url 'about' %}">Quiénes somos</a></li>
+                    <li><a href="{% url 'gallery' %}">Galería</a></li>
+                    <li><a href="{% url 'faq' %}">Preguntas frecuentes</a></li>
+                </ul>
+                <button class="btn btn-outline-dark" type="button" data-open-cart>
+                    Carrito <span class="cart-count" data-count>0</span>
+                </button>
+            </div>
+        </nav>
+        <header class="bg-dark py-5">
+            <div class="container text-center text-white py-3">
+                <p class="eyebrow">TECNOLOGÍA PARA TU DÍA A DÍA</p>
+                <h1 class="display-4 fw-bolder">Inacap Shop</h1>
+                <p class="lead text-white-50 mb-0">
+                    Audio, accesorios y componentes en un solo lugar.
+                </p>
+            </div>
+        </header>
+        <main id="contenido" class="container py-5">
+            <div class="section-heading">
+                <h2>Nuestros productos</h2>
+                <p class="text-muted">{{ total_productos }} productos · Precios en pesos chilenos</p>
+            </div>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
+                {% for producto in productos %}
+                <div class="col">
+                    <article class="card h-100 product">
+                        {% if producto.imagen %}
+                        <img
+                            class="card-img-top product-clickable"
+                            src="{{ producto.imagen.url }}"
+                            alt="{{ producto.nombre }}"
+                            width="450"
+                            height="300"
+                            style="object-fit: cover; height: 220px; cursor: pointer;"
+                            data-open-detail
                             data-name="{{ producto.nombre }}"
+                            data-desc="{{ producto.descripcion }}"
                             data-price="{{ producto.precio }}"
                             data-category="{{ producto.categoria }}"
-                            {% if producto.imagen %}
                             data-image="{{ producto.imagen.url }}"
-                            {% endif %}
-                        >
-                            Agregar al carrito
-                        </button>
+                        />
+                        {% endif %}
+                        <div class="card-body">
+                            <p class="category">{{ producto.categoria }}</p>
+                            <h3 
+                                class="h5 fw-bold product-clickable" 
+                                style="cursor: pointer;"
+                                data-open-detail
+                                data-name="{{ producto.nombre }}"
+                                data-desc="{{ producto.descripcion }}"
+                                data-price="{{ producto.precio }}"
+                                data-category="{{ producto.categoria }}"
+                                {% if producto.imagen %}data-image="{{ producto.imagen.url }}"{% endif %}
+                            >
+                                {{ producto.nombre }}
+                            </h3>
+                            
+                            <!-- Botón para abrir la descripción y valoración -->
+                            <button 
+                                type="button" 
+                                class="btn btn-link btn-sm text-decoration-none p-0 mb-3 text-primary text-start"
+                                data-open-detail
+                                data-name="{{ producto.nombre }}"
+                                data-desc="{{ producto.descripcion }}"
+                                data-price="{{ producto.precio }}"
+                                data-category="{{ producto.categoria }}"
+                                {% if producto.imagen %}data-image="{{ producto.imagen.url }}"{% endif %}
+                            >
+                                Ver descripción y opinar →
+                            </button>
+
+                            <p class="price mt-auto">${{ producto.precio }}</p>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 pb-3">
+                            <button
+                                class="btn btn-dark w-100"
+                                type="button"
+                                data-add-to-cart
+                                data-id="{{ producto.id }}"
+                                data-name="{{ producto.nombre }}"
+                                data-price="{{ producto.precio }}"
+                                data-category="{{ producto.categoria }}"
+                                {% if producto.imagen %}
+                                data-image="{{ producto.imagen.url }}"
+                                {% endif %}
+                            >
+                                Agregar al carrito
+                            </button>
+                        </div>
+                    </article>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center py-5">
+                    <p class="text-muted fs-5">No hay productos disponibles por el momento.</p>
+                    <p class="text-muted">Agrega productos desde el panel de administración de Django.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </main>
+
+        <!-- Footer con Redes Sociales simuladas -->
+        <footer class="bg-dark text-white py-4">
+            <div class="container footer-inner">
+                <div>
+                    <strong>Inacap Shop</strong>
+                    <p class="mb-0 text-white-50 small">Proyecto académico · Catálogo y precios de demostración · 2026</p>
+                </div>
+                <div class="footer-social-links" aria-label="Redes sociales">
+                    <!-- Instagram -->
+                    <a href="https://example.com/instagram" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Instagram (Simulado)" aria-label="Instagram">
+                        <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                    </a>
+                    <!-- X / Twitter -->
+                    <a href="https://example.com/x" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="X / Twitter (Simulado)" aria-label="X">
+                        <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    </a>
+                    <!-- Facebook -->
+                    <a href="https://example.com/facebook" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Facebook (Simulado)" aria-label="Facebook">
+                        <svg viewBox="0 0 24 24"><path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/></svg>
+                    </a>
+                    <!-- TikTok -->
+                    <a href="https://example.com/tiktok" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="TikTok (Simulado)" aria-label="TikTok">
+                        <svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.59-1v7.65c-.01 2.36-.93 4.67-2.61 6.32-1.75 1.7-4.23 2.56-6.7 2.4-2.52-.16-4.9-1.37-6.42-3.37-1.49-1.97-1.95-4.61-1.32-7.05.61-2.4 2.37-4.4 4.69-5.32 1.11-.45 2.31-.66 3.51-.64v4.06c-.84-.04-1.69.19-2.38.68-.78.55-1.28 1.45-1.37 2.42-.09.98.24 1.98.92 2.69.69.72 1.68 1.07 2.67.97.98-.1 1.86-.71 2.29-1.6.26-.53.37-1.13.36-1.73V.02z"/></svg>
+                    </a>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Modal Burbuja: Descripción y Valoración de Estrellas con Números -->
+        <dialog id="product-detail-dialog" class="detail-dialog" aria-labelledby="modal-product-name">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <span id="modal-product-category" class="category text-primary fw-semibold small"></span>
+                    <h2 id="modal-product-name" class="h4 mb-0 fw-bold"></h2>
+                </div>
+                <button type="button" class="btn-close" id="close-detail-dialog" aria-label="Cerrar"></button>
+            </div>
+
+            <!-- Contenedor descripción -->
+            <div class="product-info-bubble p-3 rounded mb-3" style="background-color: #f8f9fa; border: 1px solid #e9ecef;">
+                <h6 class="fw-bold text-dark mb-2">Descripción:</h6>
+                <p id="modal-product-desc" class="text-muted mb-0" style="line-height: 1.6;"></p>
+                <p class="h5 fw-bold text-dark mt-3 mb-0" id="modal-product-price"></p>
+            </div>
+
+            <hr class="my-3 text-muted">
+
+            <!-- Sección de estrellas y comentario -->
+            <section class="rating-section">
+                <h5 class="fw-bold mb-3 h6">Deja tu valoración y comentario</h5>
+                
+                <form id="rating-form" onsubmit="event.preventDefault(); submitReview();">
+                    <div class="mb-3">
+                        <label class="form-label d-block fw-semibold mb-2 small text-muted">Puntuación:</label>
+                        <div class="rating-options">
+                            <label class="rating-badge">
+                                <input type="radio" name="rating" value="1" required />
+                                <span>★ 1 estrella</span>
+                            </label>
+                            <label class="rating-badge">
+                                <input type="radio" name="rating" value="2" />
+                                <span>★ 2 estrellas</span>
+                            </label>
+                            <label class="rating-badge">
+                                <input type="radio" name="rating" value="3" />
+                                <span>★ 3 estrellas</span>
+                            </label>
+                            <label class="rating-badge">
+                                <input type="radio" name="rating" value="4" />
+                                <span>★ 4 estrellas</span>
+                            </label>
+                            <label class="rating-badge">
+                                <input type="radio" name="rating" value="5" />
+                                <span>★ 5 estrellas</span>
+                            </label>
+                        </div>
                     </div>
-                </article>
+
+                    <div class="mb-3">
+                        <label for="review-comment" class="form-label fw-semibold small text-muted">Tu comentario:</label>
+                        <textarea 
+                            id="review-comment" 
+                            class="form-control" 
+                            rows="3" 
+                            placeholder="Escribe tu opinión sobre este producto..." 
+                            required
+                        ></textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-outline-secondary" id="cancel-detail-btn">Cerrar</button>
+                        <button type="submit" class="btn btn-dark">Publicar opinión</button>
+                    </div>
+                </form>
+
+                <div id="review-success" class="alert alert-success mt-3 d-none mb-0 py-2 small">
+                    ¡Gracias! Tu valoración ha sido registrada con éxito.
+                </div>
+            </section>
+        </dialog>
+
+        <!-- Modal del carrito original -->
+        <dialog id="cart-dialog" aria-labelledby="cart-title">
+            <div class="cart-heading">
+                <h2 id="cart-title">Tu carrito</h2>
+                <button
+                    type="button"
+                    class="btn btn-outline-dark"
+                    data-close-cart
+                    aria-label="Cerrar carrito"
+                >
+                    Cerrar
+                </button>
             </div>
-            {% empty %}
-            <div class="col-12 text-center py-5">
-                <p class="text-muted fs-5">No hay productos disponibles por el momento.</p>
-                <p class="text-muted">Agrega productos desde el panel de administración de Django.</p>
+            <div id="cart-items"></div>
+            <div class="cart-summary">
+                <p>Total <strong id="cart-total">$0</strong></p>
+                <p class="text-muted">
+                    Valores en pesos chilenos. Esta demostración no procesa pedidos ni pagos.
+                </p>
+                <button class="btn btn-outline-danger" id="clear-cart" type="button">
+                    Vaciar carrito</button
+                ><button class="btn btn-dark" data-close-cart type="button">
+                    Seguir viendo productos
+                </button>
             </div>
-            {% endfor %}
-        </div>
-    </main>
-{% endblock %}
+        </dialog>
+        <p id="notice" role="status" aria-live="polite"></p>
+
+        <!-- Script de control para la ventana emergente -->
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const detailDialog = document.getElementById("product-detail-dialog");
+                const closeBtn = document.getElementById("close-detail-dialog");
+                const cancelBtn = document.getElementById("cancel-detail-btn");
+                const reviewForm = document.getElementById("rating-form");
+                const successAlert = document.getElementById("review-success");
+
+                document.querySelectorAll("[data-open-detail]").forEach((trigger) => {
+                    trigger.addEventListener("click", () => {
+                        const name = trigger.getAttribute("data-name");
+                        const desc = trigger.getAttribute("data-desc");
+                        const price = trigger.getAttribute("data-price");
+                        const category = trigger.getAttribute("data-category");
+
+                        document.getElementById("modal-product-name").textContent = name;
+                        document.getElementById("modal-product-desc").textContent = desc || "Sin descripción disponible.";
+                        document.getElementById("modal-product-price").textContent = "$" + price;
+                        document.getElementById("modal-product-category").textContent = category;
+
+                        reviewForm.reset();
+                        successAlert.classList.add("d-none");
+                        detailDialog.showModal();
+                    });
+                });
+
+                const closeModal = () => detailDialog.close();
+                if (closeBtn) closeBtn.addEventListener("click", closeModal);
+                if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
+
+                detailDialog.addEventListener("click", (e) => {
+                    const rect = detailDialog.getBoundingClientRect();
+                    if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) {
+                        detailDialog.close();
+                    }
+                });
+            });
+
+            function submitReview() {
+                const successAlert = document.getElementById("review-success");
+                successAlert.classList.remove("d-none");
+                document.getElementById("rating-form").reset();
+            }
+        </script>
+    </body>
+</html>
