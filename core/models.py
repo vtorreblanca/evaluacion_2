@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Producto(models.Model):
     CATEGORIAS = [
@@ -23,3 +24,21 @@ class Producto(models.Model):
 
     def __str__(self):
         return f"{self.nombre} (${self.precio})"
+
+
+class Valoracion(models.Model):
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='valoraciones')
+    puntuacion = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        help_text="Calificación de 1 a 5 estrellas"
+    )
+    comentario = models.TextField()
+    creado = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Valoración"
+        verbose_name_plural = "Valoraciones"
+        ordering = ['-creado']
+
+    def __str__(self):
+        return f"{self.producto.nombre} - {self.puntuacion}★"
