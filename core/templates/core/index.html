@@ -113,11 +113,15 @@
                         </p>
                     </div>
                     <div class="card-footer bg-transparent border-0 pb-3">
-                        <!-- Botón de compra directo e infalible -->
+                        <!-- Botón sin subrayados de error en VS Code -->
                         <button
                             class="btn btn-dark w-100 btn-add-direct"
                             type="button"
-                            onclick="agregarDirecto('{{ producto.sku }}', '{{ producto.nombre|escapejs }}', {{ producto.precio }}, '{% if producto.imagen %}{{ producto.imagen.url|escapejs }}{% else %}/static/core/assets/images.jpeg{% endif %}')"
+                            data-sku="{{ producto.sku }}"
+                            data-nombre="{{ producto.nombre }}"
+                            data-precio="{{ producto.precio }}"
+                            data-imagen="{% if producto.imagen %}{{ producto.imagen.url }}{% else %}/static/core/assets/images.jpeg{% endif %}"
+                            onclick="agregarDesdeBoton(this)"
                         >
                             Agregar al carrito
                         </button>
@@ -188,12 +192,11 @@
         {% endif %}
     </main>
 
-    <!-- MOTOR DEL CARRITO Y MODAL INTEGRADO SIN DEPENDENCIAS DE ARCHIVOS EXTERNOS -->
+    <!-- MOTOR DEL CARRITO TOTALMENTE AUTÓNOMO -->
     <script>
         const CART_STORAGE_KEY = 'inacap-shop-cart-v1';
         const CART_ITEMS_INFO_KEY = 'inacap-shop-items-info';
 
-        // Obtener estado del carrito
         function getCartData() {
             try {
                 return JSON.parse(localStorage.getItem(CART_STORAGE_KEY)) || {};
@@ -210,7 +213,6 @@
             }
         }
 
-        // Formato moneda chilena
         function moneyCLP(val) {
             return new Intl.NumberFormat('es-CL', {
                 style: 'currency',
@@ -219,13 +221,11 @@
             }).format(val);
         }
 
-        // Renderizar el contenido dentro del modal de carrito
         function renderCartModal() {
             const cart = getCartData();
             const info = getItemsInfo();
             const totalCount = Object.values(cart).reduce((a, b) => a + b, 0);
             
-            // Actualizar contadores en la navbar
             document.querySelectorAll('[data-count]').forEach(el => el.textContent = totalCount);
 
             const itemsContainer = document.querySelector('#cart-items');
@@ -276,7 +276,14 @@
             if (clearBtn) clearBtn.disabled = false;
         }
 
-        // Función que se ejecuta al presionar "Agregar al carrito"
+        function agregarDesdeBoton(btn) {
+            const sku = btn.getAttribute('data-sku');
+            const name = btn.getAttribute('data-nombre');
+            const price = parseInt(btn.getAttribute('data-precio'), 10) || 0;
+            const image = btn.getAttribute('data-imagen');
+            agregarDirecto(sku, name, price, image);
+        }
+
         function agregarDirecto(sku, name, price, image) {
             const cart = getCartData();
             const info = getItemsInfo();
@@ -289,14 +296,12 @@
 
             renderCartModal();
 
-            // Notificación visual
             const notice = document.querySelector('#notice');
             if (notice) {
                 notice.textContent = `${name} añadido al carrito.`;
                 setTimeout(() => { notice.textContent = ''; }, 3000);
             }
 
-            // Abre el modal para confirmar
             const cartDialog = document.querySelector('#cart-dialog');
             if (cartDialog && typeof cartDialog.showModal === 'function') {
                 cartDialog.showModal();
@@ -321,7 +326,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             renderCartModal();
 
-            // Botón vaciar carrito
             const clearBtn = document.querySelector('#clear-cart');
             if (clearBtn) {
                 clearBtn.addEventListener('click', () => {
@@ -331,7 +335,6 @@
                 });
             }
 
-            // Abrir y cerrar modal carrito
             document.querySelectorAll('[data-open-cart]').forEach(b => {
                 b.addEventListener('click', () => {
                     renderCartModal();
