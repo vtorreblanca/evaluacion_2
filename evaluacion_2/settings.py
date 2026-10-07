@@ -9,74 +9,92 @@ https://docs.djangoproject.com/en/6.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
+# Docstring que identifica el proyecto, la versión del generador y enlaces a la documentación oficial
 
+# Importa Path para manejar rutas de archivos del sistema operativo usando sintaxis de objetos moderna (/ en lugar de os.path.join)
 from pathlib import Path
+
+# Importa os para interactuar con funciones del sistema operativo y variables de entorno
 import os
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Define la ruta absoluta raíz del proyecto (sube 2 niveles: settings.py -> evaluacion_2/ -> directorio raíz)
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# Clave criptográfica para firmas digitales (sesiones de usuario, tokens CSRF, firmas de contraseñas)
+# CRÍTICO: Nunca debe exponerse públicamente en repositorios ni usarse en producción sin variable de entorno (.env)
 SECRET_KEY = 'django-insecure-bxl4^q7uw+h*r$!ng9lrwl!j!_l6cyr4e$^2l_@))5qhg-$ajw'
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# Activa el modo de depuración: muestra trazas de error completas en el navegador (debe ser False en producción)
 DEBUG = True
 
+# Lista de dominios o direcciones IP desde las cuales se permite atender solicitudes (vacío permite localhost con DEBUG=True)
 ALLOWED_HOSTS = []
 
 
 # Application definition
 
+# Registro central de todas las aplicaciones activas (tanto nativas de Django como propias del proyecto)
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'core',
+    'django.contrib.admin',           # Interfaz gráfica de administración (/admin/)
+    'django.contrib.auth',            # Sistema de autenticación de usuarios y control de permisos
+    'django.contrib.contenttypes',    # Framework para relacionar modelos con metadatos del sistema
+    'django.contrib.sessions',        # Gestión de sesiones persistentes entre peticiones HTTP
+    'django.contrib.messages',        # Sistema de notificaciones flash temporales para vistas y templates
+    'django.contrib.staticfiles',     # Localización y servicio de archivos estáticos (CSS, JS, imágenes estáticas)
+    'core',                           # App propia del proyecto (donde residen Producto, Valoracion, etc.)
 ]
 
+# Secuencia de middlewares que interceptan y transforman cada solicitud (request) y respuesta (response) en orden
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.security.SecurityMiddleware',             # Inyecta cabeceras HTTP de protección (X-Content-Type-Options, etc.)
+    'django.contrib.sessions.middleware.SessionMiddleware',       # Lee y asigna la sesión a request.session mediante cookies
+    'django.middleware.common.CommonMiddleware',                 # Normaliza rutas (ej. añade barra final '/' si falta) y maneja User-Agent
+    'django.middleware.csrf.CsrfViewMiddleware',                 # Valida tokens contra ataques Cross-Site Request Forgery en formularios POST
+    'django.contrib.auth.middleware.AuthenticationMiddleware',   # Asocia al usuario actual con request.user a partir de la sesión
+    'django.contrib.messages.middleware.MessageMiddleware',       # Expone el almacenamiento de mensajes flash en la petición
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',     # Añade cabecera X-Frame-Options: DENY para evitar secuestro de clics por iframe
 ]
 
+# Cadena de importación que indica qué archivo contiene la configuración de rutas URL de primer nivel
 ROOT_URLCONF = 'evaluacion_2.urls'
 
+# Configuración del motor de procesamiento de plantillas HTML
 TEMPLATES = [
     {
+        # Especifica el motor nativo de plantillas de Django
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        # Carpetas globales adicionales fuera de las apps donde buscar archivos .html (vacío por defecto)
         'DIRS': [],
+        # True le indica a Django que busque automáticamente dentro de la subcarpeta 'templates/' de cada app en INSTALLED_APPS
         'APP_DIRS': True,
         'OPTIONS': {
+            # Funciones que inyectan variables globales de forma automática en el contexto de cualquier template renderizado
             'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.request',         # Inyecta {{ request }} en todas las plantillas
+                'django.contrib.auth.context_processors.auth',        # Inyecta {{ user }} y {{ perms }}
+                'django.contrib.messages.context_processors.messages',# Inyecta la lista {{ messages }}
             ],
         },
     },
 ]
 
+# Ruta hacia el ejecutable WSGI usado por servidores de despliegue síncronos (Gunicorn, uWSGI)
 WSGI_APPLICATION = 'evaluacion_2.wsgi.application'
 
 
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
+# Configuración de los motores de base de datos relacionales del proyecto
 DATABASES = {
     'default': {
+        # Conector del ORM para base de datos SQLite integrada en un archivo local
         'ENGINE': 'django.db.backends.sqlite3',
+        # Ubicación física y nombre del archivo de base de datos en el directorio raíz del proyecto
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
@@ -85,17 +103,22 @@ DATABASES = {
 # Password validation
 # https://docs.djangoproject.com/en/6.1/ref/settings/#auth-password-validators
 
+# Reglas de validación aplicadas al registrar o modificar contraseñas de usuarios en el sistema de autenticación
 AUTH_PASSWORD_VALIDATORS = [
     {
+        # Impide que la contraseña sea demasiado similar al nombre de usuario, correo u otros campos del perfil
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
+        # Exige un largo mínimo de caracteres (por defecto 8 caracteres)
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
     {
+        # Compara contra una lista negra de contraseñas de uso común (ej. "password123")
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
     {
+        # Impide contraseñas compuestas únicamente por dígitos numéricos
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
@@ -104,29 +127,39 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.1/topics/i18n/
 
+# Código de idioma por defecto para la interfaz del admin y mensajes traducibles del framework (español)
 LANGUAGE_CODE = 'es-es'
 
+# Zona horaria en la que Django almacena y presenta las fechas locales (Chile continental)
 TIME_ZONE = 'America/santiago'
 
+# Habilita el sistema de traducción multilingüe de Django (i18n)
 USE_I18N = True
 
+# Habilita el reconocimiento de zonas horarias: Django guarda marcas temporales en UTC en la BD y las convierte a TIME_ZONE al renderizar
 USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
+# Prefijo URL público bajo el cual el navegador solicita archivos estáticos empaquetados con el código (ej. /static/css/estilos.css)
 STATIC_URL = 'static/'
 
 
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
+# Configuración del manejador de envíos de correo del proyecto
 MAILERS = {
     'default': {
+        # Backend de pruebas: imprime el contenido completo de los correos en la terminal en vez de enviarlos por SMTP real
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
 
+# Prefijo URL público para solicitar archivos subidos dinámicamente por los usuarios o el admin (ej. /media/productos/foto.jpg)
 MEDIA_URL = '/media/'
+
+# Ruta física en el disco duro donde Django guardará los archivos subidos mediante campos ImageField o FileField (carpeta 'media/' en la raíz)
 MEDIA_ROOT = BASE_DIR / 'media'
