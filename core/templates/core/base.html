@@ -11,9 +11,13 @@
         />
         <link rel="stylesheet" href="{% static 'core/css/styles.css' %}" />
         <link rel="stylesheet" href="{% static 'core/css/shop.css' %}" />
+        {% if catalogo_json %}
+        <script id="catalogo-bd" type="application/json">{{ catalogo_json|safe }}</script>
+        {% endif %}
         <script src="{% static 'core/js/products.js' %}" defer></script>
         <script src="{% static 'core/js/cart.js' %}" defer></script>
         <script src="{% static 'core/js/scripts.js' %}" defer></script>
+
     </head>
     <body>
         <a class="skip" href="#contenido">Saltar al contenido</a>

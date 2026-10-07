@@ -29,7 +29,7 @@
                     </select>
                 </div>
 
-                <!-- Ordenamiento (Alfabeto y Precio) -->
+                <!-- Ordenamiento -->
                 <div class="col-12 col-md-5 d-flex align-items-center gap-2">
                     <label for="filter-orden" class="form-label mb-0 fw-semibold text-nowrap small text-muted">Ordenar por:</label>
                     <select id="filter-orden" name="orden" class="form-select form-select-sm" onchange="this.form.submit()">
@@ -60,7 +60,7 @@
         <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
             {% for producto in productos %}
             <div class="col">
-                <article class="card h-100 product">
+                <article class="card h-100 product" id="card-{{ producto.sku }}">
                     {% if producto.imagen %}
                     <img
                         class="card-img-top product-clickable"
@@ -81,7 +81,7 @@
                     <div class="card-body">
                         <p class="category">{{ producto.categoria }}</p>
                         <h3 
-                            class="h5 fw-bold product-clickable" 
+                            class="h5 fw-bold product-clickable product-title-text" 
                             style="cursor: pointer;"
                             data-open-detail
                             data-id="{{ producto.id }}"
@@ -113,17 +113,11 @@
                         </p>
                     </div>
                     <div class="card-footer bg-transparent border-0 pb-3">
+                        <!-- Botón de compra directo e infalible -->
                         <button
-                            class="btn btn-dark w-100"
+                            class="btn btn-dark w-100 btn-add-direct"
                             type="button"
-                            data-add-to-cart
-                            data-id="{{ producto.id }}"
-                            data-name="{{ producto.nombre }}"
-                            data-price="{{ producto.precio }}"
-                            data-category="{{ producto.categoria }}"
-                            {% if producto.imagen %}
-                            data-image="{{ producto.imagen.url }}"
-                            {% endif %}
+                            onclick="agregarDirecto('{{ producto.sku }}', '{{ producto.nombre|escapejs }}', {{ producto.precio }}, '{% if producto.imagen %}{{ producto.imagen.url|escapejs }}{% else %}/static/core/assets/images.jpeg{% endif %}')"
                         >
                             Agregar al carrito
                         </button>
@@ -150,7 +144,7 @@
             {% endfor %}
         </div>
 
-        <!-- Paginación con persistencia de filtros -->
+        <!-- Paginación -->
         {% if productos.has_other_pages %}
         <nav aria-label="Navegación de páginas" class="mt-5">
             <ul class="pagination justify-content-center">
@@ -193,4 +187,165 @@
         </nav>
         {% endif %}
     </main>
+
+    <!-- MOTOR DEL CARRITO Y MODAL INTEGRADO SIN DEPENDENCIAS DE ARCHIVOS EXTERNOS -->
+    <script>
+        const CART_STORAGE_KEY = 'inacap-shop-cart-v1';
+        const CART_ITEMS_INFO_KEY = 'inacap-shop-items-info';
+
+        // Obtener estado del carrito
+        function getCartData() {
+            try {
+                return JSON.parse(localStorage.getItem(CART_STORAGE_KEY)) || {};
+            } catch (_) {
+                return {};
+            }
+        }
+
+        function getItemsInfo() {
+            try {
+                return JSON.parse(localStorage.getItem(CART_ITEMS_INFO_KEY)) || {};
+            } catch (_) {
+                return {};
+            }
+        }
+
+        // Formato moneda chilena
+        function moneyCLP(val) {
+            return new Intl.NumberFormat('es-CL', {
+                style: 'currency',
+                currency: 'CLP',
+                maximumFractionDigits: 0
+            }).format(val);
+        }
+
+        // Renderizar el contenido dentro del modal de carrito
+        function renderCartModal() {
+            const cart = getCartData();
+            const info = getItemsInfo();
+            const totalCount = Object.values(cart).reduce((a, b) => a + b, 0);
+            
+            // Actualizar contadores en la navbar
+            document.querySelectorAll('[data-count]').forEach(el => el.textContent = totalCount);
+
+            const itemsContainer = document.querySelector('#cart-items');
+            if (!itemsContainer) return;
+            itemsContainer.replaceChildren();
+
+            const skus = Object.keys(cart).filter(sku => cart[sku] > 0);
+
+            if (skus.length === 0) {
+                const emptyMsg = document.createElement('p');
+                emptyMsg.className = 'text-muted py-3';
+                emptyMsg.textContent = 'Tu carrito está vacío. Añade un producto desde Inicio.';
+                itemsContainer.appendChild(emptyMsg);
+                document.querySelector('#cart-total').textContent = '$0';
+                const clearBtn = document.querySelector('#clear-cart');
+                if (clearBtn) clearBtn.disabled = true;
+                return;
+            }
+
+            let totalPagar = 0;
+
+            skus.forEach(sku => {
+                const qty = cart[sku];
+                const item = info[sku] || { name: sku, price: 0, image: '/static/core/assets/images.jpeg' };
+                const subtotal = item.price * qty;
+                totalPagar += subtotal;
+
+                const row = document.createElement('article');
+                row.className = 'cart-line';
+                row.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}" style="width: 64px; height: 64px; object-fit: contain;">
+                    <div>
+                        <h3 class="h6 fw-bold mb-1">${item.name}</h3>
+                        <p class="mb-1 text-muted small">${moneyCLP(item.price)} × ${qty} = <strong>${moneyCLP(subtotal)}</strong></p>
+                        <div class="quantity d-flex align-items-center gap-2">
+                            <span class="small me-2">${qty} unidad${qty === 1 ? '' : 'es'}</span>
+                            <button type="button" class="btn btn-outline-dark btn-sm px-2 py-0" onclick="modificarCantidad('${sku}', -1)">−</button>
+                            <button type="button" class="btn btn-outline-dark btn-sm px-2 py-0" onclick="modificarCantidad('${sku}', 1)">+</button>
+                            <button type="button" class="btn btn-outline-danger btn-sm py-0 ms-2" onclick="eliminarDelCarrito('${sku}')">Quitar</button>
+                        </div>
+                    </div>
+                `;
+                itemsContainer.appendChild(row);
+            });
+
+            document.querySelector('#cart-total').textContent = moneyCLP(totalPagar);
+            const clearBtn = document.querySelector('#clear-cart');
+            if (clearBtn) clearBtn.disabled = false;
+        }
+
+        // Función que se ejecuta al presionar "Agregar al carrito"
+        function agregarDirecto(sku, name, price, image) {
+            const cart = getCartData();
+            const info = getItemsInfo();
+
+            cart[sku] = (cart[sku] || 0) + 1;
+            info[sku] = { name: name, price: price, image: image };
+
+            localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+            localStorage.setItem(CART_ITEMS_INFO_KEY, JSON.stringify(info));
+
+            renderCartModal();
+
+            // Notificación visual
+            const notice = document.querySelector('#notice');
+            if (notice) {
+                notice.textContent = `${name} añadido al carrito.`;
+                setTimeout(() => { notice.textContent = ''; }, 3000);
+            }
+
+            // Abre el modal para confirmar
+            const cartDialog = document.querySelector('#cart-dialog');
+            if (cartDialog && typeof cartDialog.showModal === 'function') {
+                cartDialog.showModal();
+            }
+        }
+
+        function modificarCantidad(sku, delta) {
+            const cart = getCartData();
+            cart[sku] = (cart[sku] || 0) + delta;
+            if (cart[sku] <= 0) delete cart[sku];
+            localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+            renderCartModal();
+        }
+
+        function eliminarDelCarrito(sku) {
+            const cart = getCartData();
+            delete cart[sku];
+            localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+            renderCartModal();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCartModal();
+
+            // Botón vaciar carrito
+            const clearBtn = document.querySelector('#clear-cart');
+            if (clearBtn) {
+                clearBtn.addEventListener('click', () => {
+                    localStorage.removeItem(CART_STORAGE_KEY);
+                    localStorage.removeItem(CART_ITEMS_INFO_KEY);
+                    renderCartModal();
+                });
+            }
+
+            // Abrir y cerrar modal carrito
+            document.querySelectorAll('[data-open-cart]').forEach(b => {
+                b.addEventListener('click', () => {
+                    renderCartModal();
+                    const d = document.querySelector('#cart-dialog');
+                    if (d) d.showModal();
+                });
+            });
+
+            document.querySelectorAll('[data-close-cart]').forEach(b => {
+                b.addEventListener('click', () => {
+                    const d = document.querySelector('#cart-dialog');
+                    if (d) d.close();
+                });
+            });
+        });
+    </script>
 {% endblock %}
