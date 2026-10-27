@@ -1,0 +1,2 @@
+agregar 3 modelos relacionales y usuario no cuenta
+Revisar mailtrap para bandejas de entrada de correos
