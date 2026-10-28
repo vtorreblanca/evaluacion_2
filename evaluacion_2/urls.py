@@ -2,7 +2,7 @@
 from django.contrib import admin
 
 # Importa la función path para definir patrones de ruta URL basados en cadenas sencillas y convertidores de tipo
-from django.urls import path
+from django.urls import path, include
 
 # Importa el objeto global de configuración para acceder a las constantes definidas en settings.py (DEBUG, MEDIA_URL, etc.)
 from django.conf import settings
@@ -35,6 +35,9 @@ urlpatterns = [
     
     # Ruta para la sección de preguntas frecuentes (/faq/)
     path('faq/', views.faq, name='faq'),
+
+    # Ruta hacia la app 'contact' (/contacto/); sus rutas internas están en contact/urls.py
+    path('contacto/', include('contact.urls')),
 ]
 
 # Condicional de entorno: solo si el proyecto corre en modo depuración (desarrollo local)

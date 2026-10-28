@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',        # Sistema de notificaciones flash temporales para vistas y templates
     'django.contrib.staticfiles',     # Localización y servicio de archivos estáticos (CSS, JS, imágenes estáticas)
     'core',                           # App propia del proyecto (donde residen Producto, Valoracion, etc.)
+    'contact',                        # App del formulario de contacto (modelo MensajeContacto)
+    'social',                         # App de redes sociales administradas desde /admin (modelo RedSocial)
 ]
 
 # Secuencia de middlewares que interceptan y transforman cada solicitud (request) y respuesta (response) en orden

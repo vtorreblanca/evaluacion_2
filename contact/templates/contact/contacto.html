@@ -1,0 +1,46 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Contacto{% endblock %}
+
+{% block content %}
+    <header class="bg-dark py-5">
+        <div class="container text-center text-white py-3">
+            <p class="eyebrow">TECNOLOGÍA PARA TU DÍA A DÍA</p>
+            <h1 class="display-4 fw-bolder">Contacto</h1>
+            <p class="lead text-white-50 mb-0">
+                ¿Tienes dudas o sugerencias? Escríbenos y te responderemos a la brevedad.
+            </p>
+        </div>
+    </header>
+    <main id="contenido" class="container py-5">
+        <section class="reading">
+            {% if enviado %}
+                <div class="alert alert-success" role="status">
+                    ¡Gracias por escribirnos! Tu mensaje fue recibido y lo revisaremos pronto.
+                </div>
+            {% endif %}
+
+            <form method="post" action="{% url 'contacto' %}" novalidate>
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                {% endif %}
+
+                {% for campo in form %}
+                    <div class="mb-3">
+                        <label for="{{ campo.id_for_label }}" class="form-label fw-semibold">{{ campo.label }}</label>
+                        {{ campo }}
+                        {% for error in campo.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-dark">Enviar mensaje</button>
+                </div>
+            </form>
+        </section>
+    </main>
+{% endblock %}
