@@ -1,9 +1,11 @@
 import json
 from django.shortcuts import render, get_object_or_404
-from django.http import JsonResponse
+# Http404: excepción que representa el error "no encontrado"; JsonResponse: respuesta en formato JSON
+from django.http import Http404, JsonResponse
 from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
-from .models import Producto, Valoracion
+# Importa los 3 modelos relacionados de la app: Categoria -> Producto -> Valoracion
+from .models import Categoria, Producto, Valoracion
 
 
 def index(request):
@@ -14,7 +16,8 @@ def index(request):
     - Pagina los resultados en bloques de 4 productos por página.
     """
     # 1. Obtener todos los productos activos sin paginar para alimentar el carrito en el frontend
-    todos_activos = Producto.objects.filter(activo=True)
+    # select_related trae la categoría (FK) en la misma consulta para no hacer una consulta extra por producto
+    todos_activos = Producto.objects.filter(activo=True).select_related('categoria')
     catalogo = []
     for p in todos_activos:
         catalogo.append({
@@ -23,7 +26,8 @@ def index(request):
             'description': p.descripcion,
             'price': p.precio,
             'image': p.imagen.url if p.imagen else '/static/core/assets/images.jpeg',
-            'category': p.categoria
+            # Como categoria ahora es una FK, se envía el nombre de la categoría (texto) y no el objeto completo
+            'category': p.categoria.nombre
         })
     # Convertir el catálogo a JSON para que JS pueda leerlo de forma segura
     catalogo_json = json.dumps(catalogo)
@@ -36,9 +40,21 @@ def index(request):
     categoria = request.GET.get('categoria', '').strip()
     orden = request.GET.get('orden', '').strip()
     
-    # 3. Filtrado por categoría si el valor coincide con los permitidos
-    if categoria in ['Componentes', 'Audio', 'Accesorios']:
-        productos_list = productos_list.filter(categoria=categoria)
+    # 3. Filtro por etiqueta (GET): el parámetro ?categoria= recibe el slug de la categoría (ej: ?categoria=audio)
+    #    La lista de etiquetas ({{ categorias }}) ya no se envía desde aquí: la entrega a todas las páginas
+    #    el procesador de contexto core.context_processors.categorias_tienda
+    # Por defecto no hay categoría seleccionada (se muestran todas)
+    categoria_seleccionada = None
+    # Solo se filtra si llegó un valor en ?categoria= (cadena no vacía)
+    if categoria:
+        # Busca la categoría por su slug; .first() devuelve None si no existe
+        categoria_seleccionada = Categoria.objects.filter(slug=categoria).first()
+        # Manejo del error 404: si el valor del filtro no existe se lanza Http404 con un mensaje propio
+        # (la app 'errores' captura este error y muestra la página común de error)
+        if categoria_seleccionada is None:
+            raise Http404(f'La categoría "{categoria}" no existe.')
+        # Filtra los productos a través de la relación Producto -> Categoria
+        productos_list = productos_list.filter(categoria=categoria_seleccionada)
         
     # 4. Ordenamiento dinámico según la opción seleccionada
     if orden == 'az':
@@ -68,6 +84,8 @@ def index(request):
         'categoria_actual': categoria,
         'orden_actual': orden,
         'catalogo_json': catalogo_json,
+        # Categoría elegida (objeto) para marcar la etiqueta activa; None si no hay filtro
+        'categoria_seleccionada': categoria_seleccionada,
     })
 
 
@@ -118,7 +136,8 @@ def about(request):
 
 def gallery(request):
     """Renderiza la galería visual mostrando todos los productos cargados."""
-    productos = Producto.objects.all()
+    # select_related trae la categoría de cada producto en la misma consulta (evita una consulta por producto)
+    productos = Producto.objects.select_related('categoria')
     return render(request, 'core/gallery.html', {'productos': productos})
 
 

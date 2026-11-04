@@ -1,0 +1,48 @@
+{# Página común de error 404 para todo el sitio (app 'errores') #}
+{# Hereda la estructura general del sitio (menú, pie de página, estilos) #}
+{% extends 'core/base.html' %}
+
+{# Título de la pestaña del navegador #}
+{% block title %}Página no encontrada{% endblock %}
+
+{# Contenido propio de la página de error #}
+{% block content %}
+    <!-- Encabezado oscuro con el mismo estilo que el resto de las páginas -->
+    <header class="bg-dark py-5">
+        <div class="container text-center text-white py-3">
+            <!-- Código del error: 'eyebrow-error' lo agranda (estilo definido en core/static/core/css/shop.css) -->
+            <p class="eyebrow eyebrow-error">ERROR 404</p>
+            <!-- Título principal -->
+            <h1 class="display-4 fw-bolder">No encontramos lo que buscas</h1>
+            {# Muestra el mensaje enviado desde la vista; si no llega ninguno usa el texto por defecto #}
+            <p class="lead text-white-50 mb-0">{{ mensaje|default:"La página que buscas no existe." }}</p>
+        </div>
+    </header>
+    <main id="contenido" class="container py-5 text-center">
+        {# Muestra la dirección que pidió el usuario, solo si la vista la envió #}
+        {% if ruta %}
+        <p class="text-muted mb-4">Dirección solicitada: <code>{{ ruta }}</code></p>
+        {% endif %}
+        {# Sugerencias: las categorías llegan desde el procesador de contexto (no las envía la vista de error) #}
+        {% if categorias %}
+        <!-- Título de las sugerencias -->
+        <p class="text-muted mb-3">O revisa nuestras categorías:</p>
+        <!-- Etiquetas de categorías que llevan a la portada filtrada -->
+        <nav class="d-flex flex-wrap justify-content-center gap-2 mb-4" aria-label="Categorías disponibles">
+            {# Una etiqueta por cada categoría existente #}
+            {% for cat in categorias %}
+            <a href="{% url 'index' %}?categoria={{ cat.slug }}" class="badge rounded-pill text-bg-light border text-dark text-decoration-none fs-6 fw-normal">{{ cat.nombre }}</a>
+            {% endfor %}
+        </nav>
+        {% endif %}
+        <!-- Enlaces para seguir navegando por el sitio -->
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+            <!-- Botón principal: vuelve a la portada sin filtros -->
+            <a href="{% url 'index' %}" class="btn btn-dark">Volver al inicio</a>
+            <!-- Botón secundario: galería de productos -->
+            <a href="{% url 'gallery' %}" class="btn btn-outline-dark">Ver galería</a>
+            <!-- Botón secundario: formulario de contacto -->
+            <a href="{% url 'contacto' %}" class="btn btn-outline-dark">Contáctanos</a>
+        </div>
+    </main>
+{% endblock %}

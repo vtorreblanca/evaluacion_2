@@ -5,15 +5,37 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 
+# Define el modelo de categorías de la tienda (tabla propia en la BD)
+# Antes la categoría era un texto fijo dentro de Producto; ahora es un modelo independiente
+# para poder administrarla desde el admin y relacionarla con los productos (relación 1 a N)
+class Categoria(models.Model):
+    # Nombre visible de la categoría (ej: Audio); único para no repetir categorías
+    nombre = models.CharField(max_length=50, unique=True)
+
+    # Versión "amigable para URL" del nombre (ej: audio); se usará para filtrar por GET (?categoria=audio)
+    slug = models.SlugField(
+        max_length=60,                             # Largo máximo del texto
+        unique=True,                               # No pueden existir dos categorías con el mismo slug
+        help_text="Texto para la URL, sin espacios ni tildes (ej: audio, componentes)"  # Ayuda que se ve en el admin
+    )
+
+    # Descripción opcional de la categoría
+    descripcion = models.TextField(blank=True)
+
+    # Metadatos del modelo Categoria
+    class Meta:
+        verbose_name = "Categoría"                 # Nombre singular en la interfaz de administración
+        verbose_name_plural = "Categorías"         # Nombre plural en la interfaz de administración
+        ordering = ['nombre']                      # Orden alfabético por defecto
+
+    # Representación en texto: muestra solo el nombre (así {{ producto.categoria }} sigue mostrando "Audio")
+    def __str__(self):
+        # Devuelve el nombre de la categoría como texto
+        return self.nombre
+
+
 # Define el modelo de datos para los productos de la tienda (tabla en la BD)
 class Producto(models.Model):
-    # Lista de tuplas (valor_bd, etiqueta_humana) para restringir las opciones del campo categoria
-    CATEGORIAS = [
-        ('Componentes', 'Componentes'),
-        ('Audio', 'Audio'),
-        ('Accesorios', 'Accesorios'),
-    ]
-
     # Código único de producto (SKU), limitado a 50 caracteres y con índice único en BD
     sku = models.CharField(
         max_length=50, 
@@ -24,8 +46,10 @@ class Producto(models.Model):
     # Nombre comercial del producto con un límite de 150 caracteres
     nombre = models.CharField(max_length=150)
     
-    # Categoría seleccionable basada en la lista CATEGORIAS; por defecto 'Componentes'
-    categoria = models.CharField(max_length=50, choices=CATEGORIAS, default='Componentes')
+    # Clave foránea hacia Categoria: relación 1 a N (una categoría tiene muchos productos)
+    # on_delete=models.PROTECT: impide borrar una categoría que todavía tiene productos asociados
+    # related_name='productos': permite acceder desde la categoría con `categoria.productos.all()`
+    categoria = models.ForeignKey(Categoria, on_delete=models.PROTECT, related_name='productos')
     
     # Descripción detallada del producto (se traduce en un tipo TEXT sin límite estricto en BD)
     descripcion = models.TextField()

@@ -40,6 +40,11 @@ urlpatterns = [
     path('contacto/', include('contact.urls')),
 ]
 
+# Vista común (app 'errores') que Django usa para el error 404 en todo el sitio cuando DEBUG = False
+# (con DEBUG = True lo hace el middleware errores.middleware.Error404Middleware)
+# Variable especial de Django: indica (como texto 'app.modulo.funcion') qué vista responde los errores 404
+handler404 = 'errores.views.pagina_404'
+
 # Condicional de entorno: solo si el proyecto corre en modo depuración (desarrollo local)
 if settings.DEBUG:
     # Concatena a urlpatterns una regla para que el servidor local sirva las imágenes subidas por usuarios

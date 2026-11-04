@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'core',                           # App propia del proyecto (donde residen Producto, Valoracion, etc.)
     'contact',                        # App del formulario de contacto (modelo MensajeContacto)
     'social',                         # App de redes sociales administradas desde /admin (modelo RedSocial)
+    'errores',                        # App con la página común de error 404 para todo el sitio
 ]
 
 # Secuencia de middlewares que interceptan y transforman cada solicitud (request) y respuesta (response) en orden
@@ -59,6 +60,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',   # Asocia al usuario actual con request.user a partir de la sesión
     'django.contrib.messages.middleware.MessageMiddleware',       # Expone el almacenamiento de mensajes flash en la petición
     'django.middleware.clickjacking.XFrameOptionsMiddleware',     # Añade cabecera X-Frame-Options: DENY para evitar secuestro de clics por iframe
+    'errores.middleware.Error404Middleware',                      # Propio: envía todos los errores 404 a la página común de la app 'errores'
 ]
 
 # Cadena de importación que indica qué archivo contiene la configuración de rutas URL de primer nivel
@@ -79,6 +81,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',         # Inyecta {{ request }} en todas las plantillas
                 'django.contrib.auth.context_processors.auth',        # Inyecta {{ user }} y {{ perms }}
                 'django.contrib.messages.context_processors.messages',# Inyecta la lista {{ messages }}
+                'core.context_processors.categorias_tienda',           # Propio: inyecta {{ categorias }} (con su total de productos) en todas las plantillas
             ],
         },
     },

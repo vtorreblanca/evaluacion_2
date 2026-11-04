@@ -10,7 +10,8 @@
             content="Inacap Shop: catálogo de tecnología, audio y accesorios."
         />
         <link rel="stylesheet" href="{% static 'core/css/styles.css' %}" />
-        <link rel="stylesheet" href="{% static 'core/css/shop.css' %}" />
+        {# ?v=2: número de versión; al cambiarlo el navegador descarga el CSS nuevo en vez de usar el guardado en caché #}
+        <link rel="stylesheet" href="{% static 'core/css/shop.css' %}?v=2" />
         {% if catalogo_json %}
         <script id="catalogo-bd" type="application/json">{{ catalogo_json|safe }}</script>
         {% endif %}
@@ -50,6 +51,19 @@
                     <p class="mb-0 text-white-50 small">Proyecto académico · Catálogo y precios de demostración · 2026</p>
                 </div>
                 
+                <!-- Categorías de la tienda: vienen del procesador de contexto 'categorias_tienda' (disponible en todas las páginas) -->
+                {# Solo se dibuja si hay categorías registradas #}
+                {% if categorias %}
+                <nav class="d-flex flex-wrap align-items-center gap-2" aria-label="Categorías de la tienda">
+                    <!-- Título de la sección -->
+                    <span class="text-white-50 small me-1">Categorías:</span>
+                    {# Una etiqueta por categoría; lleva a la portada filtrada por su slug (?categoria=...) #}
+                    {% for cat in categorias %}
+                    <a href="{% url 'index' %}?categoria={{ cat.slug }}" class="badge rounded-pill text-bg-light text-decoration-none fw-normal">{{ cat.nombre }} ({{ cat.total }})</a>
+                    {% endfor %}
+                </nav>
+                {% endif %}
+
                 <!-- Redes sociales horizontales forzadas con círculos claros -->
                 <div style="display: flex !important; flex-direction: row !important; align-items: center !important; gap: 12px !important;" aria-label="Redes sociales">
                     <!-- Instagram -->

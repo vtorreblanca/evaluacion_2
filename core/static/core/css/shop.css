@@ -73,6 +73,14 @@ main {
     color: #a6c8ff;
 }
 
+/* Variante grande del eyebrow para la página común de error 404 (app 'errores') */
+.eyebrow-error {
+    font-size: clamp(2.5rem, 8vw, 4.5rem); /* Tamaño grande que se adapta al ancho de la pantalla (mín. 2.5rem, máx. 4.5rem) */
+    font-weight: 800;                      /* Letra extra gruesa */
+    letter-spacing: 0.08em;                /* Separación entre letras un poco menor que el eyebrow normal */
+    line-height: 1.1;                      /* Interlineado ajustado para que no ocupe espacio de más */
+}
+
 .section-heading {
     margin-bottom: 1.5rem;
 }

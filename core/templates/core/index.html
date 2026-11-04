@@ -18,19 +18,38 @@
         <div class="p-3 mb-4 rounded bg-light border">
             <form method="GET" action="{% url 'index' %}" class="row g-3 align-items-center justify-content-between">
                 
-                <!-- Filtro por Categoría -->
-                <div class="col-12 col-md-5 d-flex align-items-center gap-2">
-                    <label for="filter-categoria" class="form-label mb-0 fw-semibold text-nowrap small text-muted">Categoría:</label>
-                    <select id="filter-categoria" name="categoria" class="form-select form-select-sm" onchange="this.form.submit()">
-                        <option value="">Todas las categorías</option>
-                        <option value="Audio" {% if categoria_actual == 'Audio' %}selected{% endif %}>Audio</option>
-                        <option value="Accesorios" {% if categoria_actual == 'Accesorios' %}selected{% endif %}>Accesorios</option>
-                        <option value="Componentes" {% if categoria_actual == 'Componentes' %}selected{% endif %}>Componentes</option>
-                    </select>
+                <!-- Filtro por etiquetas (categorías): cada etiqueta es un enlace que envía ?categoria=<slug> por GET -->
+                <div class="col-12 col-md-7">
+                    <!-- Título de la sección de etiquetas -->
+                    <span class="form-label mb-2 d-block fw-semibold small text-muted">Categorías:</span>
+                    <!-- Contenedor de las etiquetas: flex-wrap hace que bajen de línea si no caben -->
+                    <nav class="d-flex flex-wrap gap-2" aria-label="Filtrar por categoría">
+                        <!-- Etiqueta "Todas": quita el filtro de categoría pero conserva el orden elegido -->
+                        {# href: si hay un orden elegido lo mantiene; class: se pinta oscura si no hay categoría seleccionada #}
+                        <a href="?{% if orden_actual %}orden={{ orden_actual }}{% endif %}"
+                           class="badge rounded-pill text-decoration-none fs-6 fw-normal {% if not categoria_seleccionada %}text-bg-dark{% else %}text-bg-light border text-dark{% endif %}"
+                           {% if not categoria_seleccionada %}aria-current="true"{% endif %}>
+                            Todas
+                        </a>
+                        {# Recorre las categorías enviadas desde la vista (cada una trae su campo calculado 'total') #}
+                        {% for cat in categorias %}
+                        <!-- Una etiqueta por cada registro del modelo Categoria, con su cantidad de productos -->
+                        {# href: envía el slug por GET y conserva el orden; class: oscura si es la categoría seleccionada #}
+                        <a href="?categoria={{ cat.slug }}{% if orden_actual %}&orden={{ orden_actual }}{% endif %}"
+                           class="badge rounded-pill text-decoration-none fs-6 fw-normal {% if categoria_seleccionada == cat %}text-bg-dark{% else %}text-bg-light border text-dark{% endif %}"
+                           {% if categoria_seleccionada == cat %}aria-current="true"{% endif %}>
+                            {{ cat.nombre }} <span class="opacity-75">({{ cat.total }})</span>
+                        </a>
+                        {# Fin del recorrido de categorías #}
+                        {% endfor %}
+                    </nav>
+                    <!-- Campo oculto: al cambiar el orden se mantiene la categoría seleccionada -->
+                    {# Solo se agrega si hay una categoría elegida; se envía junto al orden cuando cambia el select #}
+                    {% if categoria_seleccionada %}<input type="hidden" name="categoria" value="{{ categoria_seleccionada.slug }}">{% endif %}
                 </div>
 
                 <!-- Ordenamiento -->
-                <div class="col-12 col-md-5 d-flex align-items-center gap-2">
+                <div class="col-12 col-md-3 d-flex align-items-center gap-2">
                     <label for="filter-orden" class="form-label mb-0 fw-semibold text-nowrap small text-muted">Ordenar por:</label>
                     <select id="filter-orden" name="orden" class="form-select form-select-sm" onchange="this.form.submit()">
                         <option value="">Más recientes (Por defecto)</option>
@@ -54,7 +73,8 @@
 
         <div class="section-heading">
             <h2>Nuestros productos</h2>
-            <p class="text-muted">{{ total_productos }} productos encontrados · Precios en pesos chilenos</p>
+            {# Cantidad de resultados; si hay filtro también muestra el nombre de la categoría #}
+            <p class="text-muted">{{ total_productos }} productos encontrados{% if categoria_seleccionada %} en <strong>{{ categoria_seleccionada.nombre }}</strong>{% endif %} · Precios en pesos chilenos</p>
         </div>
 
         <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
@@ -79,7 +99,8 @@
                     />
                     {% endif %}
                     <div class="card-body">
-                        <p class="category">{{ producto.categoria }}</p>
+                        <!-- La categoría de cada producto también es una etiqueta: al hacer clic filtra por ella -->
+                        <p class="category"><a href="?categoria={{ producto.categoria.slug }}" class="text-reset text-decoration-none">{{ producto.categoria }}</a></p>
                         <h3 
                             class="h5 fw-bold product-clickable product-title-text" 
                             style="cursor: pointer;"
@@ -154,7 +175,8 @@
             <ul class="pagination justify-content-center">
                 {% if productos.has_previous %}
                 <li class="page-item">
-                    <a class="page-link text-dark" href="?page={{ productos.previous_page_number }}&categoria={{ categoria_actual }}&orden={{ orden_actual }}" aria-label="Anterior">
+                    {# Enlace de paginación: agrega categoría y orden solo si tienen valor, para no perder los filtros #}
+                    <a class="page-link text-dark" href="?page={{ productos.previous_page_number }}{% if categoria_seleccionada %}&categoria={{ categoria_seleccionada.slug }}{% endif %}{% if orden_actual %}&orden={{ orden_actual }}{% endif %}" aria-label="Anterior">
                         &laquo; Anterior
                     </a>
                 </li>
@@ -171,14 +193,14 @@
                     </li>
                     {% else %}
                     <li class="page-item">
-                        <a class="page-link text-dark" href="?page={{ i }}&categoria={{ categoria_actual }}&orden={{ orden_actual }}">{{ i }}</a>
+                        <a class="page-link text-dark" href="?page={{ i }}{% if categoria_seleccionada %}&categoria={{ categoria_seleccionada.slug }}{% endif %}{% if orden_actual %}&orden={{ orden_actual }}{% endif %}">{{ i }}</a>
                     </li>
                     {% endif %}
                 {% endfor %}
 
                 {% if productos.has_next %}
                 <li class="page-item">
-                    <a class="page-link text-dark" href="?page={{ productos.next_page_number }}&categoria={{ categoria_actual }}&orden={{ orden_actual }}" aria-label="Siguiente">
+                    <a class="page-link text-dark" href="?page={{ productos.next_page_number }}{% if categoria_seleccionada %}&categoria={{ categoria_seleccionada.slug }}{% endif %}{% if orden_actual %}&orden={{ orden_actual }}{% endif %}" aria-label="Siguiente">
                         Siguiente &raquo;
                     </a>
                 </li>
