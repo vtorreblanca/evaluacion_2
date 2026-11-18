@@ -1,4 +1,4 @@
-# Procesadores de contexto de la app 'core'
+# Procesadores de contexto de la app 'tienda'
 # Un procesador de contexto es una función que Django ejecuta en CADA página renderizada:
 # lo que devuelve (un diccionario) queda disponible como variable en todos los templates,
 # sin tener que enviarlo desde cada vista.

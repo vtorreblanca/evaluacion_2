@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',        # Gestión de sesiones persistentes entre peticiones HTTP
     'django.contrib.messages',        # Sistema de notificaciones flash temporales para vistas y templates
     'django.contrib.staticfiles',     # Localización y servicio de archivos estáticos (CSS, JS, imágenes estáticas)
-    'core',                           # App propia del proyecto (donde residen Producto, Valoracion, etc.)
+    'core',                           # App base del sitio: plantilla base, páginas generales (about, faq) y archivos estáticos
+    'tienda',                         # App de la tienda: modelos Categoria, Producto y Valoracion, catálogo con filtros y procesador de contexto
     'contact',                        # App del formulario de contacto (modelo MensajeContacto)
     'social',                         # App de redes sociales administradas desde /admin (modelo RedSocial)
     'errores',                        # App con la página común de error 404 para todo el sitio
@@ -81,7 +82,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',         # Inyecta {{ request }} en todas las plantillas
                 'django.contrib.auth.context_processors.auth',        # Inyecta {{ user }} y {{ perms }}
                 'django.contrib.messages.context_processors.messages',# Inyecta la lista {{ messages }}
-                'core.context_processors.categorias_tienda',           # Propio: inyecta {{ categorias }} (con su total de productos) en todas las plantillas
+                'tienda.context_processors.categorias_tienda',         # Propio: inyecta {{ categorias }} (con su total de productos) en todas las plantillas
             ],
         },
     },
